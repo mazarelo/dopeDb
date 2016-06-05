@@ -3,7 +3,7 @@ class Database{
 
   private $dbFolderName = "dbFiles";
   private $db;
-  private $jsonUrl = "https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbFolderName";
+//  private $jsonUrl = "https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbFolderName";
 
   function __construct($dbName){
     $this->db = $dbName;
@@ -11,7 +11,7 @@ class Database{
   }
 
   private function getJsonData(){
-    return file_get_contents("$this->jsonUrl/$this->db.json");
+    return file_get_contents("$this->dbFolderName/$this->db.json");
   }
 
   private function createFolder($name){
