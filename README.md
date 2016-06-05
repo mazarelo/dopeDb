@@ -41,7 +41,8 @@ $database->delete();
 ```
 $database->restore();
 ```
-<h2>Backs Up the .json into backups folder with the name: "backup_2016-04-05_file-name.json" </h2>
+<h2>Backs Up the .json into backups folder</h2>
+<span>File naming: "backup_2016-04-05_file-name.json"</span>
 ```
 $database->backup();
 ```
