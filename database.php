@@ -1,8 +1,9 @@
 <?php
 class Database{
 
-  private $dbLocaltion = "dbFiles";
+  private $dbFolderName = "dbFiles";
   private $db;
+  private $jsonUrl = "https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbFolderName";
 
   function __construct($dbName){
     $this->db = $dbName;
@@ -10,17 +11,19 @@ class Database{
   }
 
   private function getJsonData(){
-    return file_get_contents("https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbLocaltion/$this->db.json");
+    return file_get_contents("$this->jsonUrl/$this->db.json");
+  }
+
+  private function createFolder($name){
+    if(!file_exists($name)){
+      $oldmask = umask(0);
+      mkdir ($name, 0755);
+      umask($oldmask);
+    }
   }
 
   private function checkDbBaseFolder(){
-    if(!file_exists($this->dbLocaltion)){
-      $oldmask = umask(0);
-      mkdir ($this->dbLocaltion, 0755);
-      umask($oldmask);
-      return true;
-    }
-    return true;
+    return $this->createFolder($this->dbFolderName);;
   }
 
   private function removeObject($key){
@@ -28,7 +31,7 @@ class Database{
     $db = $this->db;
     unset($oldFile->$db->$key);
     $newFile = json_encode($oldFile);
-    return file_put_contents("$this->dbLocaltion/$this->db.json", $newFile);
+    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile);
   }
 
   private function updateFile($key , $value){
@@ -36,13 +39,37 @@ class Database{
     $db = $this->db;
     $oldFile->$db->$key = $value;
     $newFile = json_encode($oldFile);
-    return file_put_contents("$this->dbLocaltion/$this->db.json", $newFile);
+    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile);
+  }
+
+  private function restoreFromArchive(){
+    if(file_exists("archived/$this->db.json")){
+      return rename("archived/$this->db.json", "$this->dbFolderName/$this->db.json");
+    }
+    return false;
+  }
+
+
+  private function moveToArchive(){
+    if(file_exists("$this->dbFolderName/$this->db.json")){
+      $this->createFolder("archived");
+      return rename ("$this->dbFolderName/$this->db.json", "archived/$this->db.json");
+    }
+    return false;
+  }
+
+  private function moveToBackup(){
+    $this->createFolder("backups");
+    if(file_exists("$this->dbFolderName/$this->db.json")){
+        return copy("$this->dbFolderName/$this->db.json", "backups/backup_".date("Y-m-d")."_$this->db.json");
+    }
+    return false;
   }
 
   public function create(){
-    if(!file_exists("$this->dbLocaltion/$this->db.json")){
+    if(!file_exists("$this->dbFolderName/$this->db.json")){
       $jsonTemplate = (object) array($this->db => "", 'date' => date("Y/m/d"));
-      return file_put_contents("$this->dbLocaltion/$this->db.json",json_encode($jsonTemplate));
+      return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate));
     }
     return true;
   }
@@ -56,22 +83,11 @@ class Database{
   }
 
   public function restore(){
-    if(file_exists("archived/$this->db.json")){
-      return rename("archived/$this->db.json", "$this->dbLocaltion/$this->db.json");
-    }
+    return $this->restoreFromArchive();
   }
 
   public function delete(){
-    if(file_exists("$this->dbLocaltion/$this->db.json")){
-      if(!file_exists("archived")){
-        $oldmask = umask(0);
-        mkdir ("archived", 0755);
-        umask($oldmask);
-      }
-      return rename ("$this->dbLocaltion/$this->db.json", "archived/$this->db.json");
-    //return unlink("$this->dbLocaltion/$this->db.json");
-    }
-    return false;
+    return $this->moveToArchive();
   }
 
   public function read(){
@@ -82,12 +98,12 @@ class Database{
     return $this->updateFile($key , $val);
   }
 
-  public function backupDb(){
-    return true;
+  public function backup(){
+    return $this->moveToBackup();
   }
 
   public function listDatabases(){
-    return print json_encode(array_values(preg_grep('/^([^.])/', scandir($this->dbLocaltion))));
+    return print json_encode(array_values(preg_grep('/^([^.])/', scandir($this->dbFolderName))));
   }
 
 }
