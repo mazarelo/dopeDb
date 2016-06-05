@@ -49,9 +49,10 @@ class Database{
 
   public function create(){
     if(!file_exists("$this->dbLocaltion/$this->db.json")){
-      return fopen("$this->dbLocaltion/$this->db.json", 'w');
+      $jsonTemplate = (object) array($this->db => "", 'date' => date("Y/m/d"));
+      return file_put_contents("$this->dbLocaltion/$this->db.json",json_encode($jsonTemplate));
     }
-    return var_dump("Db allready Exists");
+    return true;
   }
 
   public function insert($key,$val){
@@ -82,7 +83,7 @@ class Database{
   }
 
   public function listDatabases(){
-    return print json_encode(preg_grep('/^([^.])/', scandir($this->dbLocaltion)));
+    return print json_encode(array_values(preg_grep('/^([^.])/', scandir($this->dbLocaltion))));
   }
 
 }
