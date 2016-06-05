@@ -37,7 +37,7 @@ $database->remove($key);
 ```
 $database->delete();
 ```
-<h2>Restores the previous archived .json to the folder dbFiles</h2>
+<h2>Restores the previous archived .json to the Database folder</h2>
 ```
 $database->restore();
 ```
