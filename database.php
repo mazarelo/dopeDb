@@ -74,7 +74,7 @@ class Database{
 
   public function create(){
     if(!file_exists("$this->dbFolderName/$this->db.json")){
-      $jsonTemplate = (object) array($this->db => "", 'date' => date("Y/m/d"));
+      $jsonTemplate = (object) array($this->db => "");
       return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate));
     }
     return true;
