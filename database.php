@@ -9,14 +9,6 @@ class Database{
     return $this->checkDbBaseFolder();
   }
 
-  private function validateFile(){
-    $handle = $this->readFile();
-    if(!$handle){
-      return $this->createFile();
-    }
-    return $handle;
-  }
-
   private function getJsonData(){
     return file_get_contents("https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbLocaltion/$this->db.json");
   }
