@@ -8,7 +8,7 @@ Super easy database with Json files.
 /* Use this to initialize the DB */
 $database = new Database("users");
 ```
-<h2>Generate (choosen_name).json file</h2>
+<h2>Generate (choosen_name).json</h2>
 ```
 $database->create();
 ```
@@ -18,22 +18,22 @@ $key = "firstName";
 $value = "Joao";
 $database->insert($key, $value);
 ```
-<h2>Read the .json file</h2>
+<h2>Read the .json</h2>
 ```
 $database->read();
 ```
-<h2>Update values in the .json file</h2>
+<h2>Update values in the .json</h2>
 ```
 $key = "firstName";
 $updatedValue = "Joao";
 $database->insert($key, $updatedValue);
 ```
-<h2>Remove Object from json</h2>
+<h2>Remove Object from .json</h2>
 ```
 $key = "firstName";
 $database->remove($key);
 ```
-<h2>Creates a Archive folder and moves the Json file there</h2>
+<h2>Creates a Archive folder and moves the .json there</h2>
 ```
 $database->delete();
 ```
@@ -41,7 +41,7 @@ $database->delete();
 ```
 $database->restore();
 ```
-<h2>List all files</h2>
+<h2>List all files in dbFiles folder</h2>
 ```
 $database->listDatabases();
 ```
