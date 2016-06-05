@@ -3,7 +3,6 @@ class Database{
 
   private $dbFolderName = "dbFiles";
   private $db;
-//  private $jsonUrl = "https://$_SERVER[HTTP_HOST]/backoffice/db/$this->dbFolderName";
 
   function __construct($dbName){
     $this->db = $dbName;
@@ -66,6 +65,13 @@ class Database{
     return false;
   }
 
+  private function permanentDelete(){
+    if(file_exists("$this->dbFolderName/$this->db.json")){
+      return unlink("$this->dbFolderName/$this->db.json");
+    }
+    return false;
+  }
+
   public function create(){
     if(!file_exists("$this->dbFolderName/$this->db.json")){
       $jsonTemplate = (object) array($this->db => "", 'date' => date("Y/m/d"));
@@ -84,6 +90,14 @@ class Database{
 
   public function restore(){
     return $this->restoreFromArchive();
+  }
+
+  public function purge(){
+    return $this->permanentDelete();
+  }
+
+  public function deleteBackup(){
+    /* yet to come */
   }
 
   public function delete(){
