@@ -63,9 +63,21 @@ class Database{
     return $this->removeObject($key);
   }
 
+  public function restore(){
+    if(file_exists("archived/$this->db.json")){
+      return rename("archived/$this->db.json", "$this->dbLocaltion/$this->db.json");
+    }
+  }
+
   public function delete(){
     if(file_exists("$this->dbLocaltion/$this->db.json")){
-      return unlink("$this->dbLocaltion/$this->db.json");
+      if(!file_exists("archived")){
+        $oldmask = umask(0);
+        mkdir ("archived", 0755);
+        umask($oldmask);
+      }
+      return rename ("$this->dbLocaltion/$this->db.json", "archived/$this->db.json");
+    //return unlink("$this->dbLocaltion/$this->db.json");
     }
     return false;
   }
