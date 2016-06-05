@@ -1,5 +1,5 @@
 # jsonDb
-Json+php light Database class
+Json + PHP light Database Class
 
 Super easy database with Json files.
 
