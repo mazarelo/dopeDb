@@ -41,7 +41,7 @@ $database->delete();
 ```
 $database->restore();
 ```
-<h2>List all files in dbFiles folder</h2>
+<h2>List all files in Database folder</h2>
 ```
 $database->listDatabases();
 ```
