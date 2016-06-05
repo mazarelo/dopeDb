@@ -7,31 +7,37 @@ Super easy database with Json files.
 ```
 /* Use this to initialize the DB */
 $database = new Database("users");
-
-/* Create the file users.json  */
+```
+<h2>Generate users.json file</h2>
+```
 $database->create();
-
-/* Insert data in the file */
+```
+<h2>Insert data in the file</h2>
+```
 $key = "firstName";
 $value = "Joao";
 $database->insert($key, $value);
-
-/* Read a Json file */
+```
+<h2>Read a Json file</h2>
+```
 $database->read();
-
-/* Update json */
+```
+<h2>Update values in the json file</h2>
+```
 $key = "firstName";
 $updatedValue = "Joao";
 $database->insert($key, $updatedValue);
-
-/* Remove Object from json */
+```
+<h2>Remove Object from json</h2>
+```
 $key = "firstName";
 $database->remove($key);
-
-/* Delete a Json file */
+```
+<h2>Delete a Json file</h2>
+```
 $database->delete();
-
-/* List all files */
+```
+<h2>List all files</h2>
+```
 $database->listDatabases();
-
 ```
