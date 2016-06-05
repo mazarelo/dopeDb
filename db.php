@@ -7,7 +7,7 @@
     if($_GET["method"]){
       switch($_GET["method"]){
         case "read";
-          $data = $database->read();
+          $database->read();
         break;
         case "create":
           $database->create();
@@ -23,6 +23,9 @@
         break;
         case "delete":
           $database->delete();
+        break;
+        case "restore":
+          $database->restore();
         break;
         case "listDatabases":
           $database->listDatabases();
