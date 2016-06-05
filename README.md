@@ -33,9 +33,13 @@ $database->insert($key, $updatedValue);
 $key = "firstName";
 $database->remove($key);
 ```
-<h2>Delete a Json file</h2>
+<h2>Creates a Archive folder and moves the Json file there</h2>
 ```
 $database->delete();
+```
+<h2>Restores the previous deleted .json to the folder dbFiles</h2>
+```
+$database->restore();
 ```
 <h2>List all files</h2>
 ```
