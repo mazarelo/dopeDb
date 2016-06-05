@@ -33,7 +33,7 @@ $database->insert($key, $updatedValue);
 $key = "firstName";
 $database->remove($key);
 ```
-<h2>Creates a Archive folder and moves the .json there</h2>
+<h2>Soft Delete - creates a archive folder and moves the .json there</h2>
 ```
 $database->delete();
 ```
