@@ -38,7 +38,7 @@ class Database{
     $db = $this->db;
     $oldFile->$db->$key = $value;
     $newFile = json_encode($oldFile);
-    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile);
+    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile , LOCK_EX );
   }
 
   private function restoreFromArchive(){
@@ -47,7 +47,6 @@ class Database{
     }
     return false;
   }
-
 
   private function moveToArchive(){
     if(file_exists("$this->dbFolderName/$this->db.json")){
@@ -75,7 +74,7 @@ class Database{
   public function create(){
     if(!file_exists("$this->dbFolderName/$this->db.json")){
       $jsonTemplate = (object) array($this->db => "");
-      return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate));
+      return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate) , LOCK_EX);
     }
     return true;
   }
