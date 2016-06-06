@@ -70,6 +70,22 @@ class Database{
     }
     return false;
   }
+  /* to be worked on */
+  private function queryJsonFile($query){
+    $file = (array) json_decode($this->getJsonData());
+    $q = $query;
+    $arr = (object) array("results" => array());
+
+    foreach ($file as $key => $value) {
+      foreach($value as $sin => $val){
+        if(strpos($val, $q)  !== false ){
+          $obj = (object) array($sin => $val);
+          array_push( $arr->results , $obj);
+        }
+      }
+    }
+    return json_encode($arr);
+  }
 
   public function create(){
     if(!file_exists("$this->dbFolderName/$this->db.json")){
@@ -77,6 +93,11 @@ class Database{
       return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate) , LOCK_EX);
     }
     return true;
+  }
+
+  public function query($query){
+    /* yet to come */
+    return $this->queryJsonFile($query);
   }
 
   public function insert($key,$val){
