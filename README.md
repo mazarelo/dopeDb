@@ -1,4 +1,4 @@
-# jsonDb
+# dopeDb
 Json + PHP light Database Class
 
 Super easy database with Json files.
