@@ -73,12 +73,12 @@ class Database{
   /* to be worked on */
   private function queryJsonFile($query){
     $file = (array) json_decode($this->getJsonData());
-    $q = $query;
+    $q = strtolower($query);
     $arr = (object) array("results" => array());
 
     foreach ($file as $key => $value) {
       foreach($value as $sin => $val){
-        if(strpos($val, $q)  !== false ){
+        if(strpos(strtolower($val), $q)  !== false ){
           $obj = (object) array($sin => $val);
           array_push( $arr->results , $obj);
         }
