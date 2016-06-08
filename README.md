@@ -22,7 +22,7 @@ $database->insert($key, $value);
 ```
 $database->read();
 ```
-<h2>Query the .json</h2>
+<h2>Query the .json (case insensitive)</h2>
 It will return an array with Key => Val of all Keys that mention the string inserted.
 ```
 $database->query("search term here");
