@@ -22,6 +22,11 @@ $database->insert($key, $value);
 ```
 $database->read();
 ```
+<h2>Query the .json</h2>
+It will return an array with Key => Val of all Keys that mention the string inserted.
+```
+$database->query("search term here");
+```
 <h2>Update values in the .json</h2>
 ```
 $key = "firstName";
