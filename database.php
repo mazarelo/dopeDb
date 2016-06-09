@@ -125,7 +125,7 @@ class Database{
   }
 
   public function read(){
-    echo $this->getJsonData();
+    return $this->getJsonData();
   }
 
   public function update($key , $val){
