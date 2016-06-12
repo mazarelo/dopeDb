@@ -12,6 +12,10 @@ $database = new Database("users");
 ```
 $database->create();
 ```
+<h2>Rename current .json file</h2>
+```
+$database->rename($newName);
+```
 <h2>Insert data in the .json</h2>
 ```
 $key = "firstName";
