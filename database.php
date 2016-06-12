@@ -3,11 +3,13 @@ class Database{
 
   private $dbFolderName = "dbFiles";
   private $db;
-
+  private $imageFolderName = "uploads";
   function __construct($dbName){
     $this->db = $dbName;
     return $this->checkDbBaseFolder();
   }
+
+  /* ------------------------------------ helpers ---------------------------- */
 
   private function getJsonData(){
     return file_get_contents("$this->dbFolderName/$this->db.json");
@@ -21,16 +23,41 @@ class Database{
     }
   }
 
+  private function renameJsonFile($old,$new){
+    return rename ("$old.json","$new.json");
+  }
+
+  private function checkIfJsonFileExists($location){
+      return (file_exists($location) == true) ? true : false;
+  }
+
   private function checkDbBaseFolder(){
     return $this->createFolder($this->dbFolderName);;
   }
+
+  private function listAllImages($location){
+    $images = glob("$location/*.{jpeg,gif,png}", GLOB_BRACE);
+    return json_encode($images);
+  }
+
+  private function listAllJsonFiles($location){
+    return json_encode(array_values(preg_grep('/^([^.])/', scandir($location))));
+  }
+
+  /* ---------------------------- Private functions --------------------------- */
 
   private function removeObject($key){
     $oldFile = (object) json_decode($this->getJsonData());
     $db = $this->db;
     unset($oldFile->$db->$key);
     $newFile = json_encode($oldFile);
-    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile);
+    file_put_contents("$this->dbFolderName/$this->db.json", $newFile);
+    return $this->getJsonData();
+  }
+  
+  private function renameDatabase($new){
+    $this->renameJsonFile("$this->dbFolderName/$this->db" , "$this->dbFolderName/$new");
+    return $this->listAllJsonFiles($this->dbFolderName);
   }
 
   private function updateFile($key , $value){
@@ -38,34 +65,38 @@ class Database{
     $db = $this->db;
     $oldFile->$db->$key = $value;
     $newFile = json_encode($oldFile);
-    return file_put_contents("$this->dbFolderName/$this->db.json", $newFile , LOCK_EX );
+    file_put_contents("$this->dbFolderName/$this->db.json", $newFile , LOCK_EX );
+    return $this->getJsonData();
   }
 
   private function restoreFromArchive(){
-    if(file_exists("archived/$this->db.json")){
-      return rename("archived/$this->db.json", "$this->dbFolderName/$this->db.json");
+    if($this->checkIfJsonFileExists("archived/$this->db.json")){
+      $this->renameJsonFile("archived/$this->db","$this->dbFolderName/$this->db");
+      return $this->listAllJsonFiles("archived");
     }
     return false;
   }
 
   private function moveToArchive(){
-    if(file_exists("$this->dbFolderName/$this->db.json")){
+    if($this->checkIfJsonFileExists("$this->dbFolderName/$this->db.json")){
       $this->createFolder("archived");
-      return rename ("$this->dbFolderName/$this->db.json", "archived/$this->db.json");
+      $this->renameJsonFile("$this->dbFolderName/$this->db","archived/$this->db");
+      return $this->listAllJsonFiles($this->dbFolderName);
     }
     return false;
   }
 
   private function moveToBackup(){
     $this->createFolder("backups");
-    if(file_exists("$this->dbFolderName/$this->db.json")){
-        return copy("$this->dbFolderName/$this->db.json", "backups/backup_".date("Y-m-d")."_$this->db.json");
+    if(checkIfJsonFileExists()){
+        copy("$this->dbFolderName/$this->db.json", "backups/backup_".date("Y-m-d")."_$this->db.json");
+        return $this->listAllJsonFiles($this->dbFolderName);
     }
     return false;
   }
 
   private function permanentDelete(){
-    if(file_exists("$this->dbFolderName/$this->db.json")){
+    if($this->checkIfJsonFileExists("$this->dbFolderName/$this->db.json")){
       return unlink("$this->dbFolderName/$this->db.json");
     }
     return false;
@@ -87,12 +118,59 @@ class Database{
     return json_encode($arr);
   }
 
-  public function create(){
-    if(!file_exists("$this->dbFolderName/$this->db.json")){
-      $jsonTemplate = (object) array($this->db => "");
-      return file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate) , LOCK_EX);
+  private function uploadAndResizeImages(){
+    if(isset($_FILES)){
+      include "../app/classes/images.php";
+      $num_files = count($_FILES['file']['name']);
+      $this->createFolder($this->imageFolderName);
+      $this->createFolder("$this->imageFolderName/$this->db");
+      $i = 0;
+      foreach($_FILES['file']['tmp_name'] as $key => $value) {
+        $file_name = $_FILES['file']['name'][$key];
+        $file_type = $_FILES['file']['type'][$key];
+        $file_size = $_FILES['file']['size'][$key];
+        $file_tmp  = $_FILES['file']['tmp_name'][$key];
+        $picture =  $_FILES['file']['name'][$key];
+
+        $handle = new upload($file_tmp);
+
+        if ($handle->uploaded) {
+          $handle->file_new_name_body   = 'image_resized'."_".$i;
+          $handle->image_resize         = true;
+          $handle->image_x              = 1500;
+          $handle->image_ratio_y        = true;
+          $handle->image_convert = 'jpg';
+          $handle->jpeg_quality = 85;
+          $handle->process("$this->imageFolderName/$this->db");
+
+          if ($handle->processed) {
+            echo 'image resized';
+            $handle->clean();
+          } else {
+            echo 'error : ' . $handle->error;
+          }
+        }else{
+          echo "wrong";
+        }
+        $i++;
+      }
+      return $this->listAllImages($location);
     }
-    return true;
+  }
+
+  private function createJsonFile(){
+    if(!$this->checkIfJsonFileExists("$this->dbFolderName/$this->db.json")){
+      $jsonTemplate = (object) array($this->db => "");
+      file_put_contents("$this->dbFolderName/$this->db.json",json_encode($jsonTemplate) , LOCK_EX);
+      return $this->listAllJsonFiles($this->dbFolderName);
+    }
+    return $this->listAllJsonFiles($this->dbFolderName);
+  }
+
+  /* ------------------------- Public functions ------------------------- */
+
+  public function create(){
+    return $this->createJsonFile();
   }
 
   public function query($query){
@@ -132,12 +210,24 @@ class Database{
     return $this->updateFile($key , $val);
   }
 
+  public function rename($new){
+      return $this->renameDatabase($new);
+  }
+
+  public function upload(){
+    return $this->uploadAndResizeImages();
+  }
+
   public function backup(){
     return $this->moveToBackup();
   }
 
   public function listDatabases(){
-    return print json_encode(array_values(preg_grep('/^([^.])/', scandir($this->dbFolderName))));
+    return $this->listAllJsonFiles($this->dbFolderName);
+  }
+
+  public function listImages(){
+    return $this->listAllImages("$this->imageFolderName/$this->db");
   }
 
 }
