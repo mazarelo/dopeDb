@@ -14,7 +14,7 @@ $database->create();
 ```
 <h2>Rename current .json file</h2>
 ```
-$database->rename($newName);
+$database->rename("new-name");
 ```
 <h2>Insert data in the .json</h2>
 ```
